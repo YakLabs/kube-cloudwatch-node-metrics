@@ -1,0 +1,84 @@
+{
+    "apiVersion": "extensions/v1beta1",
+    "kind": "DaemonSet",
+    "metadata": {
+        "name": "kube-cloudwatch-node-metrics",
+        "namespace": "kube-system",
+        "labels": {
+            "name": "kube-cloudwatch-node-metrics",
+            "version": "0.1.0"
+        }
+    },
+    "spec": {
+        "template": {
+            "metadata": {
+                "labels": {
+                    "name": "kube-cloudwatch-node-metrics",
+                    "version": "0.1.0"
+                }
+            },
+            "spec": {
+                "restartPolicy": "Always",
+                "terminationGracePeriodSeconds": 60,
+                "volumes": [],
+                "imagePullSecrets": [],
+                "containers": [
+                    {
+                        "name": "kubectl",
+                        "image": "<docker_repo>/kube-cloudwatch-node-metrics:0.1.0",
+                        "command": [
+                            "/usr/bin/kubectl",
+                            "proxy",
+                            "--port=8001"
+                        ],
+                        "resources": {
+                            "requests": {
+                                "cpu": "10m",
+                                "memory": "8Mi"
+                            },
+                            "limits": {
+                                "cpu": "50m",
+                                "memory": "32Mi"
+                            }
+                        }
+                    },
+                    {
+                        "name": "metrics",
+                        "command": [
+                            "/start"
+                        ],
+                        "resources": {
+                            "requests": {
+                                "cpu": "25m",
+                                "memory": "8Mi"
+                            },
+                            "limits": {
+                                "cpu": "50m",
+                                "memory": "32Mi"
+                            }
+                        },
+                        "image": "<docker_repo>/kube-cloudwatch-node-metrics:0.1.0",
+                        "env": [
+                            {
+                                "name": "KUBERNETES_NAMESPACE",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "fieldPath": "metadata.namespace"
+                                    }
+                                }
+                            },
+                            {
+                                "name": "KUBERNETES_PODNAME",
+                                "valueFrom": {
+                                    "fieldRef": {
+                                        "fieldPath": "metadata.name"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+}

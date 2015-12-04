@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# these environment variables should be set via the manifest using the
+# Kubernetes downward API.
+
+if [ -z ${KUBERNETES_NAMESPACE} ]; then
+    echo KUBERNETES_NAMESPACE must be set
+    exit -2
+fi
+
+if [ -z ${KUBERNETES_PODNAME} ]; then
+    echo KUBERNETES_PODNAME must be set
+    exit -2
+fi
+
+NODE=""
+
+while true; do
+    NODE=`curl -s http://127.0.0.1:8001/api/v1/namespaces/${KUBERNETES_NAMESPACE}/pods/${KUBERNETES_PODNAME} | jq -r .spec.nodeName`
+    if [ -n "${NODE}" ]; then
+        break
+    fi
+    sleep 5
+done
+
+exec /usr/bin/kube-cloudwatch-node-metrics -node ${NODE}
+
