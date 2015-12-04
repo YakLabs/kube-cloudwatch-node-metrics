@@ -15,8 +15,45 @@ set.
 
 `kube-cloudwatch-node-metrics` should be ran on each Kubernetes node.
 A [daemonset](http://kubernetes.io/v1.1/docs/admin/daemons.html) is
-the preferred method.
+the preferred method. An example [manifest](./daemonset.json) is included.
 
+## Building and Using
+
+This assumes you have enabled
+[daemonsets](http://kubernetes.io/v1.1/docs/admin/daemons.html) in
+your Kubernetes cluster.  The nodes also need permissions to describe
+instances, describe tags and push
+Cloudwatch metrics. A policy can be used, such as:
+
+```json
+{
+    "Version" : "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeInstances",
+                "ec2:DescribeTags",
+                "cloudwatch:PutMetricData"
+            ],
+            "Resource": "*"
+            }
+       ]
+}
+```
+
+The simple way is to use the build script:
+```shell
+export DOCKER_REPO=my.docker.registry/mynamespace
+docker login ${DOCKER_REPO}
+./build.sh
+```
+
+This will build the binary and the Docker image. If `DOCKER_REPO` is
+set, it will also push to it.
+
+Edit  `daemonset.json` with the correct image information, and then
+create the daemonset using `kubectl create -f daemonset.json`.
 ## Design
 
 This initial version is extremely simple.
@@ -27,7 +64,10 @@ This initial version is extremely simple.
 * It does not use watches. It fetches the pods for the node on every
 run.
 * It curently only uses the Kubernetes API. It could use the "pods"
-  end point on the kubelet.
+end point on the kubelet.
+* It does not use the official Kubernetes Go API client.  The official
+  one has many dependencies and can challenging to build. This only
+  uses a few structs, so doing it "by hand" is more straightforward.
 
 ## TODO
 
@@ -37,4 +77,4 @@ see [LICENSE](./LICENSE)
 
 ## Authors
 
-Writing by the Engineering Team at [Yik Yak](http://www.yikyakapp.com/)
+Written by the Engineering Team at [Yik Yak](http://www.yikyakapp.com/)
