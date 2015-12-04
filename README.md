@@ -5,15 +5,14 @@ Emit AWS Cloudwatch metrics for Kubernetes node CPU usage for Autoscaling
 percentage of CPU "reserved" on a Kubernetes node.  It defines
 "reserved" CPU as the sum of all the
 [compute resources](http://kubernetes.io/v1.1/docs/user-guide/compute-resources.html)
-of all the containers on a node.  It uses `requests` if set. It will
-use `limits` if `requests` is not set, and a default if neither are
+of all the containers on a node.  It uses `requests` if set, `limits` if `requests` is not set, and a default if neither are
 set.
 
 `kube-cloudwatch-node-metrics` emits a single metric
 `KubernetesCPUPercent` in the `Kubernetes` Cloudwatch namespace every
 60 seconds. This can be used for alerting and/or for configuring AWS autoscaling.
 
-`kube-cloudwatch-node-metrics` should be ran on each Kubernetes node.
+`kube-cloudwatch-node-metrics` should be run on each Kubernetes node.
 A [daemonset](http://kubernetes.io/v1.1/docs/admin/daemons.html) is
 the preferred method. An example [manifest](./daemonset.json) is included.
 
