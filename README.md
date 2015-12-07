@@ -57,7 +57,7 @@ create the daemonset using `kubectl create -f daemonset.json`.
 
 This initial version is extremely simple.
 
-*It does not handle API authentication. It assumes you will be running
+* It does not handle API authentication. It assumes you will be running
  [kubectl proxy](http://kubernetes.io/v1.1/docs/user-guide/kubectl/kubectl_proxy.html)
  in the same pod.
 * It does not use watches. It fetches the pods for the node on every
